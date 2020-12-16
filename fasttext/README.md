@@ -11,8 +11,7 @@ NLP의 기초가 되는 word2vec은 텍스트를 숫자로 바꾸어서 계산�
 
 ### fasttext
 
-sequence to sequence부터 BERT까지 다양한 모델이 존재하지만, facebook이 자체 공개하기도 했고 당근마켓 글에서도 해당 모델을 사용했기에 이번 글에서도 해당 모델로 진행하였다.  
-fasttext 모델의 경우 word2vec을 제안한 T. Mikolov가 저자로 참여하였고 위에서 언급된 "형태적(Morpological) 유사성"과 frequency, "out-of-vocabulary" 문제들을 개선하였는데 이는 fasttext 모델의 원리가 "morpological structure"를 활용하여 단어의 의미 정보를 추출해냈기 때문이다. 이를 통해 "형태적 유사성"을 해결 할 수 있을 뿐 아니라, 빈도가 낮거나 존재하지 않았던 단어들도 처리 할 수 있게 되었다.
+sequence to sequence부터 BERT까지 다양한 모델이 존재하지만, facebook이 자체 공개하기도 했고 당근마켓 글에서도 해당 모델을 사용했기에 이번 글에서도 해당 모델로 진행하였다. fasttext 모델의 경우 word2vec을 제안한 T. Mikolov가 저자로 참여하였고 위에서 언급된 "형태적(Morpological) 유사성"과 frequency, "out-of-vocabulary" 문제들을 개선하였는데 이는 fasttext 모델의 원리가 "morpological structure"를 활용하여 단어의 의미 정보를 추출해냈기 때문이다. 이를 통해 "형태적 유사성"을 해결 할 수 있을 뿐 아니라, 빈도가 낮거나 존재하지 않았던 단어들도 처리 할 수 있게 되었다.
 
 ## Install
 
@@ -24,7 +23,7 @@ $ pip3 install gensim
 ```
 
 ### pre-trained 모델 다운로드
-[홈페이지](https://fasttext.cc/docs/en/crawl-vectors.html)에서 다운받을 수 있고 한국어 분류를 위해 한국어 모델(cc.ko.300.*)을 다운로드 받았습니다.
+[홈페이지](https://fasttext.cc/docs/en/crawl-vectors.html)에서 다운받을 수 있고 본 예제에서는 한국어 분류를 진행해보기 위해 위해 한국어 모델(cc.ko.300.*)을 다운로드 받았습니다.
 
 ## Demo
 
@@ -86,22 +85,44 @@ model = models.fasttext.load_facebook_model('cc.ko.300.bin')
 
 for w, sim in model.wv.similar_by_word('치킨', 5):
     print(f'{w}: {sim}')
+for w, sim in model.wv.most_similar('치킨', topn=5):
+    print(f'{w}: {sim}')
 
-print(model.wv.most_similar('치킨', topn=5))
-print(mode.wv.similarity('치킨', '피자'))
-print(loaded_model.wv.most_similar(positive=['돼지', '소고기'], negative=['야채'], topn=1))
+print(model.wv.similarity('치킨', '피자'))
+print(model.wv.most_similar(positive=['돼지', '소고기'], negative=['야채'], topn=1))
 ```
+
+- results
+```
+탄두리: 0.5830886363983154
+뿌링클: 0.5815541744232178
+BHC: 0.5803220868110657
+피자랑: 0.572679877281189
+파닭: 0.5700914859771729
+
+탄두리: 0.5830886363983154
+뿌링클: 0.5815541744232178
+BHC: 0.5803220868110657
+피자랑: 0.572679877281189
+파닭: 0.5700914859771729
+
+0.51051223
+
+[('쇠고기', 0.4336152672767639)]
+```
+
+methods 모두 직관적인 네이밍을 하고 있어서 쉽게 사용 해 볼 수 있고 `similar_by_word()`와 `most_similar()` 메소드가 나누어져 있어서 둘 다 사용해보았는데 예상대로 같은 결과가 나오는 것을 확인 할 수 있다.
 
 ## 결론
 
 페이스북에서 제공해주는 FastText 라이브러리를 사용해보았는데 사용법이 단순하고 pre-trained 모델을 제공해줘서 쉽게 사용 해 볼 수 있었다. 하지만, 그렇게 좋은 결과를 얻을 수는 없었고 이는 차후에 프로젝트를 진행하게 되면 추가 데이터를 사용해서 학습을 진행할 예정이다.
 
 ## 참고자료
-[당근마켓의 카테고리 자동 추천](https://medium.com/daangn/%EA%B8%80%EC%93%B0%EA%B8%B0-%EC%B9%B4%ED%85%8C%EA%B3%A0%EB%A6%AC-%EC%B6%94%EC%B2%9C%EB%AA%A8%EB%8D%B8-%EA%B0%9C%EB%B0%9C%ED%95%98%EA%B8%B0-cbbcc43e1f7f)
-[Advances in Pre-Training Distributed Word Representations](https://arxiv.org/abs/1712.09405)
-[fasttext 공식 홈페이지](https://fasttext.cc/docs/en/support.html)
-[쉽게 쓰여진 word2vec](https://dreamgonfly.github.io/blog/word2vec-explained/)
-[Attention mechanism in NLP](https://lovit.github.io/machine%20learning/2019/03/17/attention_in_nlp/)
-[A introduction of fastText](https://byeongkijeong.github.io/fastText/)
-[gensim - tutorial - fastText](https://frhyme.github.io/python-libs/gensim2_fasttext/)
-[FastText Pre-trained 한국어 모델 사용하기](https://inahjeon.github.io/fasttext/)
+- [당근마켓의 카테고리 자동 추천](https://medium.com/daangn/%EA%B8%80%EC%93%B0%EA%B8%B0-%EC%B9%B4%ED%85%8C%EA%B3%A0%EB%A6%AC-%EC%B6%94%EC%B2%9C%EB%AA%A8%EB%8D%B8-%EA%B0%9C%EB%B0%9C%ED%95%98%EA%B8%B0-cbbcc43e1f7f)
+- [Advances in Pre-Training Distributed Word Representations](https://arxiv.org/abs/1712.09405)
+- [fasttext 공식 홈페이지](https://fasttext.cc/docs/en/support.html)
+- [쉽게 쓰여진 word2vec](https://dreamgonfly.github.io/blog/word2vec-explained/)
+- [Attention mechanism in NLP](https://lovit.github.io/machine%20learning/2019/03/17/attention_in_nlp/)
+- [A introduction of fastText](https://byeongkijeong.github.io/fastText/)
+- [gensim - tutorial - fastText](https://frhyme.github.io/python-libs/gensim2_fasttext/)
+- [FastText Pre-trained 한국어 모델 사용하기](https://inahjeon.github.io/fasttext/)
